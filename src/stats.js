@@ -5,7 +5,7 @@ class Stats extends Component{
 render(){
   return(
     <div>
-      <h1>'stats'</h1>
+      <h1>stats</h1>
     </div>
   );
 }
