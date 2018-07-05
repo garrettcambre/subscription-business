@@ -6,7 +6,7 @@ class AdminPage extends Component{
 render(){
   return(
     <div>
-      <Navbar/>
+      <Navbar isAdminLoggedIn={this.props.isAdminLoggedIn}/>
       <Stats/>
     </div>
   );

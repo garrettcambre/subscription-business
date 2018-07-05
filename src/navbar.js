@@ -3,28 +3,28 @@ import './App.css';
 
 class Navbar extends Component{
 render(){
-  let isLoggedIn = true;
-  if (isLoggedIn){
+  if (this.props.isAdminLoggedIn){
   return(
-    <div className='navbar' >
+    <div >
       <ul>
-        <li>1</li>
-        <li>1</li>
-        <li>1</li>
-        <li>1</li>
-        <li>1</li>
+        <li className='navbar'>2</li>
+        <li className='navbar'>2</li>
+        <li className='navbar'>2</li>
+        <li className='navbar'>2</li>
+        <li className='navbar'>2</li>
+        <li className='navbar'>2</li>
       </ul>
     </div>
   );
 } else{
   return(
-    <div className='navbar' >
+    <div  >
       <ul>
-        <li>1</li>
-        <li>1</li>
-        <li>1</li>
-        <li>1</li>
-        <li>1</li>
+        <li className='navbar'>1</li>
+        <li className='navbar'>1</li>
+        <li className='navbar'>1</li>
+        <li className='navbar'>1</li>
+        <li className='navbar'>1</li>
       </ul>
     </div>
   );

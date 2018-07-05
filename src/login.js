@@ -32,7 +32,7 @@ render(){
         <button onClick={this.handleAdminClick}>login admin</button>
         <button onClick={this.handleUserClick}>login user</button>
       </div>
-      <AdminPage/>
+      <AdminPage isAdminLoggedIn={this.state.isAdminLoggedIn}/>
     </div>
   );
 }else{
