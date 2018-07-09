@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import UserLogin from './userlogin';
+
 
 class Footer extends Component{
   render(){
@@ -7,8 +7,7 @@ class Footer extends Component{
       <div className="footer">
 
       footer
-      <br/>
-      <UserLogin/>
+
 
       </div>
     );
