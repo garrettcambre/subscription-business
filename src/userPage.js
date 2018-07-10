@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import Navbar from './navbar';
-import Home from './home';
+
 
 class UserPage extends Component{
 render(){
   return(
     <div>
       <Navbar/>
-      <Home/>
+      <h1>{this.props.users}</h1>
     </div>
   );
 }
