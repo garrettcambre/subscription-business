@@ -8,16 +8,26 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputEmail: '',
-      inputPassword:'',
+      inputEmail: 'bridgetthampton@quinex.com',
+      inputPassword:'non',
       isUserLoggedIn: false,
       isAdminLoggedIn: false,
-      modal: false
+      modal: false,
+      userInfo:{
+        accountBalance: '',
+        maxBalance: '',
+        usersName: '',
+      },
+
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.toggle = this.toggle.bind(this);
+
+
+
+
   }
 
     toggle() {
@@ -29,11 +39,17 @@ class Login extends Component {
     handleSubmit(e){
       console.log('submitted');
       e.preventDefault();
-      let userQuery = (objectArray, state) => {
+      let userInfo = {...this.state.userInfo};
+
+      let userQuery = (objectArray, state) =>{
        let i;
        for(i=0; i<objectArray.length; i++){
          if(objectArray[i].email === state.inputEmail && objectArray[i].password === state.inputPassword){
-         return this.setState({isUserLoggedIn:true, isAdminLoggedIn:false, modal: !this.state.modal})
+         return this.setState({isUserLoggedIn:true, isAdminLoggedIn:false, modal: !this.state.modal}),
+           userInfo.accountBalance = objectArray[i].balance,
+           userInfo.usersName = objectArray[i].name,
+           userInfo.maxBalance = objectArray[i].maxBalance//change that this is set in state and checks userInfo against state
+
         } else if('garrett.cambre@gmail.com' === state.inputEmail && "imTheAdmin" === state.inputPassword ){
          return this.setState({isUserLoggedIn:false, isAdminLoggedIn:true, modal: !this.state.modal})
         } else{
@@ -42,8 +58,9 @@ class Login extends Component {
        }
      }
       userQuery(userList, this.state);
-
+        this.setState({userInfo})
     };
+
 
     handleEmailChange(e){
       this.setState({inputEmail: e.target.value});
@@ -139,18 +156,12 @@ class Login extends Component {
               </Modal>
             </div>
           <br/>
-            <UserPage />
+            <UserPage userInfo={this.state.userInfo}/>
         </div>
       );
     }
   }
 };
-
-
-
-
-
-
 
 
 let userList = [
@@ -159,7 +170,8 @@ let userList = [
     "index": 0,
     "guid": "d873815c-011b-4778-8ce6-edc20a924aa5",
     "isActive": false,
-    "balance": "$497.00",
+    "balance": "157.56",
+    "maxBalance":"500",
     "picture": "http://placehold.it/32x32",
     "age": 50,
     "name": "Bridgett Hampton",
@@ -175,7 +187,8 @@ let userList = [
     "index": 1,
     "guid": "511d18bf-d229-4f37-b641-78bba0e3a6f1",
     "isActive": false,
-    "balance": "$311.22",
+    "balance": "311.22",
+    "maxBalance":"500",
     "picture": "http://placehold.it/32x32",
     "age": 36,
     "name": "Angelia Hartman",
@@ -191,7 +204,8 @@ let userList = [
     "index": 2,
     "guid": "c04efc6d-4bc0-440b-ac33-1b5b5d4a3461",
     "isActive": false,
-    "balance": "$459.72",
+    "balance": "255.67",
+    "maxBalance":"500",
     "picture": "http://placehold.it/32x32",
     "age": 22,
     "name": "Josephine Meyers",
