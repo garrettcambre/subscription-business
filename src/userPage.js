@@ -7,14 +7,17 @@ render(){
   return(
     <div>
          <Navbar/>
-         <h1> Hello, {this.props.userInfo.usersName}</h1>
-         <h3>your account balance is: ${this.props.userInfo.accountBalance}</h3>
+         <h1> Hello, {this.props.usersName}</h1>
+         <h3>your account balance is: ${this.props.accountBalance}</h3>
          <div>
            <div className="text-center">
-            {parseFloat(this.props.userInfo.accountBalance)} of {parseFloat(this.props.userInfo.maxBalance)}
+            {parseFloat(this.props.accountBalance)} of {parseFloat(this.props.maxBalance)}
+            <button onClick={this.props.decrementMaxBalance}>-</button>
+            <button onClick={this.props.incrementMaxBalance}>+</button>
             </div>
-           <Progress value={this.props.userInfo.accountBalance} max={this.props.userInfo.maxBalance} />
+           <Progress value={this.props.accountBalance} max={this.props.maxBalance} />
          </div>
+
     </div>
 
   );

@@ -13,21 +13,17 @@ class Login extends Component {
       isUserLoggedIn: false,
       isAdminLoggedIn: false,
       modal: false,
-      userInfo:{
-        accountBalance: '',
-        maxBalance: '',
-        usersName: '',
-      },
+      accountBalance: '',
+      maxBalance: '',
+      usersName: '',
 
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.toggle = this.toggle.bind(this);
-
-
-
-
+    this.incrementMaxBalance = this.incrementMaxBalance.bind(this);
+    this.decrementMaxBalance = this.decrementMaxBalance.bind(this);
   }
 
     toggle() {
@@ -39,16 +35,18 @@ class Login extends Component {
     handleSubmit(e){
       console.log('submitted');
       e.preventDefault();
-      let userInfo = {...this.state.userInfo};
 
       let userQuery = (objectArray, state) =>{
        let i;
        for(i=0; i<objectArray.length; i++){
          if(objectArray[i].email === state.inputEmail && objectArray[i].password === state.inputPassword){
-         return this.setState({isUserLoggedIn:true, isAdminLoggedIn:false, modal: !this.state.modal}),
-           userInfo.accountBalance = objectArray[i].balance,
-           userInfo.usersName = objectArray[i].name,
-           userInfo.maxBalance = objectArray[i].maxBalance//change that this is set in state and checks userInfo against state
+         return this.setState({
+          isUserLoggedIn:true,
+          isAdminLoggedIn:false,
+          modal: !this.state.modal,
+          accountBalance: objectArray[i].balance,
+          usersName: objectArray[i].name,
+          maxBalance: objectArray[i].maxBalance})
 
         } else if('garrett.cambre@gmail.com' === state.inputEmail && "imTheAdmin" === state.inputPassword ){
          return this.setState({isUserLoggedIn:false, isAdminLoggedIn:true, modal: !this.state.modal})
@@ -58,9 +56,29 @@ class Login extends Component {
        }
      }
       userQuery(userList, this.state);
-        this.setState({userInfo})
     };
-
+    incrementMaxBalance(){
+      let search=(objectArray )=>{
+      let i;
+      for(i=0; i<objectArray.length; i++){
+        if(objectArray[i].email === this.state.inputEmail)
+        objectArray[i].maxBalance += 10
+        return   this.setState({maxBalance: userList[i].maxBalance})
+      }
+    }
+    search(userList);
+    };
+    decrementMaxBalance(){
+      let search=(objectArray, value=10 )=>{
+      let i;
+      for(i=0; i<objectArray.length; i++){
+        if(objectArray[i].email === this.state.inputEmail)
+        objectArray[i].maxBalance -= value
+        return   this.setState({maxBalance: userList[i].maxBalance})
+      }
+    }
+    search(userList);
+    };
 
     handleEmailChange(e){
       this.setState({inputEmail: e.target.value});
@@ -156,7 +174,12 @@ class Login extends Component {
               </Modal>
             </div>
           <br/>
-            <UserPage userInfo={this.state.userInfo}/>
+            <UserPage
+              accountBalance={this.state.accountBalance}
+              usersName={this.state.usersName}
+              maxBalance={this.state.maxBalance}
+              incrementMaxBalance={this.incrementMaxBalance}
+              decrementMaxBalance={this.decrementMaxBalance}/>
         </div>
       );
     }
@@ -170,8 +193,8 @@ let userList = [
     "index": 0,
     "guid": "d873815c-011b-4778-8ce6-edc20a924aa5",
     "isActive": false,
-    "balance": "157.56",
-    "maxBalance":"500",
+    "balance": 157.56,
+    "maxBalance":500,
     "picture": "http://placehold.it/32x32",
     "age": 50,
     "name": "Bridgett Hampton",
@@ -187,8 +210,8 @@ let userList = [
     "index": 1,
     "guid": "511d18bf-d229-4f37-b641-78bba0e3a6f1",
     "isActive": false,
-    "balance": "311.22",
-    "maxBalance":"500",
+    "balance": 311.22,
+    "maxBalance":500,
     "picture": "http://placehold.it/32x32",
     "age": 36,
     "name": "Angelia Hartman",
@@ -204,8 +227,8 @@ let userList = [
     "index": 2,
     "guid": "c04efc6d-4bc0-440b-ac33-1b5b5d4a3461",
     "isActive": false,
-    "balance": "255.67",
-    "maxBalance":"500",
+    "balance": 255.67,
+    "maxBalance":500,
     "picture": "http://placehold.it/32x32",
     "age": 22,
     "name": "Josephine Meyers",
