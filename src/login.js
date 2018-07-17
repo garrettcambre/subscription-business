@@ -31,6 +31,14 @@ class Login extends Component {
       modal: !this.state.modal
     });
     }
+    handleEmailChange(e){
+      this.setState({inputEmail: e.target.value});
+    };
+
+    handlePasswordChange(e){
+      this.setState({inputPassword: e.target.value});
+    };
+
 
     handleSubmit(e){
       console.log('submitted');
@@ -57,6 +65,7 @@ class Login extends Component {
      }
       userQuery(userList, this.state);
     };
+    // after this point these functions are called in child components through props
     incrementMaxBalance(){
       let search=(objectArray )=>{
       let i;
@@ -68,6 +77,7 @@ class Login extends Component {
     }
     search(userList);
     };
+
     decrementMaxBalance(){
       let search=(objectArray, value=10 )=>{
       let i;
@@ -79,14 +89,8 @@ class Login extends Component {
     }
     search(userList);
     };
+    
 
-    handleEmailChange(e){
-      this.setState({inputEmail: e.target.value});
-    };
-
-    handlePasswordChange(e){
-      this.setState({inputPassword: e.target.value});
-    };
 
   render(){
       if (!this.state.isAdminLoggedIn && !this.state.isUserLoggedIn){
