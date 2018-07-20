@@ -1,4 +1,4 @@
-[
+{ "users" :[
   {
     "_id": "5b3e5eb4c37e380e7a73ee93",
     "index": 0,
@@ -50,4 +50,5 @@
     "address": "239 Ridgecrest Terrace, Cincinnati, Ohio, 58364",
     "registered": "09-29-2017 T06:36:35 +04:00"
   }
-]
+  ]
+}

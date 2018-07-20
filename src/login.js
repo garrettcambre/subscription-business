@@ -3,6 +3,7 @@ import AdminPage from './adminPage';
 import UserPage from './userPage';
 import Home from './home';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import Signup from './signup';
 
 class Login extends Component {
   constructor(props) {
@@ -16,6 +17,7 @@ class Login extends Component {
       accountBalance: '',
       maxBalance: '',
       usersName: '',
+      usersIndex: '',
 
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -54,7 +56,8 @@ class Login extends Component {
           modal: !this.state.modal,
           accountBalance: objectArray[i].balance,
           usersName: objectArray[i].name,
-          maxBalance: objectArray[i].maxBalance})
+          maxBalance: objectArray[i].maxBalance,
+          usersIndex: objectArray[i].index,})
 
         } else if('garrett.cambre@gmail.com' === state.inputEmail && "imTheAdmin" === state.inputPassword ){
          return this.setState({isUserLoggedIn:false, isAdminLoggedIn:true, modal: !this.state.modal})
@@ -89,7 +92,7 @@ class Login extends Component {
     }
     search(userList);
     };
-    
+
 
 
   render(){
@@ -98,6 +101,8 @@ class Login extends Component {
         <div>
         <div>
           <Button color="danger" onClick={this.toggle}>Login</Button>
+          <Signup/>
+
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
             <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
             <ModalBody>
@@ -117,7 +122,10 @@ class Login extends Component {
               <Button color="secondary" onClick={this.toggle}>Cancel</Button>
             </ModalFooter>
           </Modal>
+
+
         </div>
+
           <br/>
           <Home/>
         </div>
@@ -183,7 +191,8 @@ class Login extends Component {
               usersName={this.state.usersName}
               maxBalance={this.state.maxBalance}
               incrementMaxBalance={this.incrementMaxBalance}
-              decrementMaxBalance={this.decrementMaxBalance}/>
+              decrementMaxBalance={this.decrementMaxBalance}
+              userIndex={this.state.userIndex}/>
         </div>
       );
     }
