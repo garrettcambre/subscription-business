@@ -43,30 +43,14 @@ class Login extends Component {
 
 
     handleSubmit(e){
-      console.log('submitted');
       e.preventDefault();
+      firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // ...
+      });
 
-      let userQuery = (objectArray, state) =>{
-       let i;
-       for(i=0; i<objectArray.length; i++){
-         if(objectArray[i].email === state.inputEmail && objectArray[i].password === state.inputPassword){
-         return this.setState({
-          isUserLoggedIn:true,
-          isAdminLoggedIn:false,
-          modal: !this.state.modal,
-          accountBalance: objectArray[i].balance,
-          usersName: objectArray[i].name,
-          maxBalance: objectArray[i].maxBalance,
-          usersIndex: objectArray[i].index,})
-
-        } else if('garrett.cambre@gmail.com' === state.inputEmail && "imTheAdmin" === state.inputPassword ){
-         return this.setState({isUserLoggedIn:false, isAdminLoggedIn:true, modal: !this.state.modal})
-        } else{
-         console.log('your email or password is incorrect')
-        }
-       }
-     }
-      userQuery(userList, this.state);
     };
     // after this point these functions are called in child components through props
     incrementMaxBalance(){

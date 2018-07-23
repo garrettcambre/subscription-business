@@ -9,6 +9,11 @@ constructor(props){
     modal:false,
     inputEmail: '',
     inputPassword:'',
+    inputName:'',
+    inputAddress:'',
+    inputNumber:'',
+    errorCode:'',
+    errorMessage:''
   }
   this.toggle = this.toggle.bind(this);
   this.handleSubmit = this.handleSubmit.bind(this);
@@ -44,12 +49,18 @@ handleSubmit(){
 let auth = firebase.auth();
 let email = this.state.inputEmail;
 let password = this.state.inputPassword;
+let name = this.state.inputName;
+let address = this.state.inputAddress;
+let number = this.state.inputNumber;
+
 auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
   // Handle Errors here.
-
+  console.log(errorCode, errorMessage);
+  this.setState({errorCode: errorCode, errorMessage:errorMessage});
+  
   var errorCode = error.code;
   var errorMessage = error.message;
-  console.log(errorCode,errorMessage)
+
   // ...
 });
 
@@ -81,6 +92,7 @@ auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
                   <p>Perferred Phone Number</p>
                   <input type= 'text' onChange={this.handleNumberChange} value={this.state.inputNumber}/>
                   <br/>
+                  <p>{this.state.errorCode} {this.state.errorMessage}</p>
                   <br/>
                 </form>
               </div>
