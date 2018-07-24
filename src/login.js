@@ -4,13 +4,14 @@ import UserPage from './userPage';
 import Home from './home';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Signup from './signup';
+import * as firebase from 'firebase';
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputEmail: 'bridgetthampton@quinex.com',
-      inputPassword:'non',
+      inputEmail: 'garrett.cambre@gmail.com',
+      inputPassword:'letmein',
       isUserLoggedIn: false,
       isAdminLoggedIn: false,
       modal: false,
@@ -43,15 +44,35 @@ class Login extends Component {
 
 
     handleSubmit(e){
+      var currentUser = firebase.auth().currentUser;
+      var name;
       e.preventDefault();
-      firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-        // Handle Errors here.
+      let email = this.state.inputEmail;
+      let password = this.state.inputPassword;
+      let auth = firebase.auth();
+
+      auth.signInWithEmailAndPassword(email, password).catch(function(error) {
         var errorCode = error.code;
         var errorMessage = error.message;
-        // ...
       });
 
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          console.log(user)
+        } else {
+          console.log("user is signed out")
+        }
+      });
+
+      if (currentUser) {
+        console.log(currentUser);
+        }
+
+      this.setState({
+        modal: !this.state.modal
+      })
     };
+
     // after this point these functions are called in child components through props
     incrementMaxBalance(){
       let search=(objectArray )=>{
@@ -85,7 +106,7 @@ class Login extends Component {
         <div>
         <div>
           <Button color="danger" onClick={this.toggle}>Login</Button>
-          <Signup/>
+          <Signup />
 
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
             <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>

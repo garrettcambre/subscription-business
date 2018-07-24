@@ -3,7 +3,6 @@ import Login from './login';
 import Footer from './footer';
 import { Row, Col} from 'reactstrap';
 import * as firebase from 'firebase';
-
 import './App.css';
 
 class App extends Component {
