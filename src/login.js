@@ -12,6 +12,9 @@ class Login extends Component {
     this.state = {
       inputEmail: 'garrett.cambre@gmail.com',
       inputPassword:'letmein',
+      inputName:'',
+      inputAddress:'',
+      inputNumber:'',
       isUserLoggedIn: false,
       isAdminLoggedIn: false,
       modal: false,
@@ -19,6 +22,7 @@ class Login extends Component {
       maxBalance: '',
       usersName: '',
       usersIndex: '',
+      signupModal:false,
 
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -27,6 +31,11 @@ class Login extends Component {
     this.toggle = this.toggle.bind(this);
     this.incrementMaxBalance = this.incrementMaxBalance.bind(this);
     this.decrementMaxBalance = this.decrementMaxBalance.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this);
+    this.handleNumberChange = this.handleNumberChange.bind(this);
+    this.handleAddressChange = this.handleAddressChange.bind(this);
+    this.toggleSignup = this.toggleSignup.bind(this);
+    this.handleSignup = this.handleSignup.bind(this);
   }
 
     toggle() {
@@ -73,7 +82,89 @@ class Login extends Component {
       })
     };
 
+    signout(){
+      firebase.auth().signOut().then(function() {
+        console.log('user signed out')
+      }).catch(function(error) {
+        console.log('user not signed out')
+      });
+    }
+
     // after this point these functions are called in child components through props
+    handleNameChange(e){
+      this.setState({inputName: e.target.value});
+    };
+    handleAddressChange(e){
+      this.setState({inputAddress: e.target.value});
+    };
+    handleNumberChange(e){
+      this.setState({inputNumber: e.target.value});
+    };
+    toggleSignup(){
+      this.setState({
+        signupModal: !this.state.signupModal
+      })
+    };
+
+    handleSignup(){
+          let email = this.state.inputEmail;
+          let password = this.state.inputPassword;
+          let name = this.state.inputName;
+          let address = this.state.inputAddress;
+          let number = this.state.inputNumber;
+          let auth = firebase.auth();
+          var frbsUser = firebase.auth().currentUser;
+          let frbsEmail = firebase.auth().currentUser.email;
+          let frbsUid = firebase.auth().currentUser.uid;
+          let frbsName = firebase.auth().currentUser.userName;
+          let defaultMaxBalance = 300;
+
+          this.setState({
+            signupModal: !this.state.signupModal
+          });
+
+          auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+          });
+
+
+          firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+              console.log('user should be signed in')
+            } else {
+              console.log('user isnt signed in')
+            }
+          });
+
+
+            function writeNewUser(uid, name, email, address, number) {
+              // binding to hold all of the initailly gathered user data bindings
+              var userData = {
+                name: name,
+                email: frbsEmail,
+                address: address,
+                number: number,
+                maxBalance: defaultMaxBalance,
+                uid: frbsUid
+              };
+              //updates is an object that can hold more than one KV pair set
+              var updates = {};
+              console.log('writenewuser')
+              updates['users/' + frbsUid] = userData;
+              return firebase.database().ref().update(updates);
+            }
+            writeNewUser(frbsUid, name, email, address, number);
+            console.log(frbsUser)
+            console.log(frbsEmail)
+            console.log(email)
+
+    };
+
+
+
+
     incrementMaxBalance(){
       let search=(objectArray )=>{
       let i;
@@ -106,7 +197,21 @@ class Login extends Component {
         <div>
         <div>
           <Button color="danger" onClick={this.toggle}>Login</Button>
-          <Signup />
+          <Signup
+              handleEmailChange={this.handleEmailChange}
+              handlePasswordChange={this.handlePasswordChange}
+              handleAddressChange={this.handleAddressChange}
+              handleNameChange={this.handleNameChange}
+              handleNumberChange={this.handleNumberChange}
+              inputName={this.state.inputName}
+              inputEmail={this.state.inputEmail}
+              inputNumber={this.state.inputNumber}
+              inputAddress={this.state.inputAddress}
+              inputPassword={this.state.inputPassword}
+              handleSignup={this.handleSignup}
+              toggleSignup={this.toggleSignup}
+              signupModal={this.state.signupModal}
+          />
 
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
             <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
@@ -132,6 +237,7 @@ class Login extends Component {
         </div>
 
           <br/>
+          <button onClick={this.signout}>signout</button>
           <Home/>
         </div>
       );
