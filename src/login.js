@@ -65,17 +65,9 @@ class Login extends Component {
         var errorMessage = error.message;
       });
 
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          console.log(user)
-        } else {
-          console.log("user is signed out")
-        }
-      });
-
       if (currentUser) {
         console.log(currentUser);
-        }
+      }
 
       this.setState({
         modal: !this.state.modal
@@ -107,21 +99,14 @@ class Login extends Component {
     };
 
     handleSignup(){
-          let email = this.state.inputEmail;
-          let password = this.state.inputPassword;
-          let name = this.state.inputName;
-          let address = this.state.inputAddress;
-          let number = this.state.inputNumber;
-          let auth = firebase.auth();
+          var email = this.state.inputEmail;
+          var password = this.state.inputPassword;
+          var auth = firebase.auth();
+          var name = this.state.inputName;
+          var address = this.state.inputAddress;
+          var number = this.state.inputNumber;
+          var defaultMaxBalance = 300;
           var frbsUser = firebase.auth().currentUser;
-          let frbsEmail = firebase.auth().currentUser.email;
-          let frbsUid = firebase.auth().currentUser.uid;
-          let frbsName = firebase.auth().currentUser.userName;
-          let defaultMaxBalance = 300;
-
-          this.setState({
-            signupModal: !this.state.signupModal
-          });
 
           auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
             // Handle Errors here.
@@ -129,37 +114,38 @@ class Login extends Component {
             var errorMessage = error.message;
           });
 
+          firebase.auth().onAuthStateChanged(function(frbsUser) {
+              if (frbsUser) {
 
-          firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-              console.log('user should be signed in')
-            } else {
-              console.log('user isnt signed in')
-            }
+                var frbsEmail = firebase.auth().currentUser.email;
+                var frbsUid = firebase.auth().currentUser.uid;
+                var frbsName = firebase.auth().currentUser.userName;
+
+                var writeNewUser = function(uid, name, email, address, number) {
+                  // binding to hold all of the initailly gathered user data bindings
+                  var userData = {
+                    name: name,
+                    email: frbsEmail,
+                    address: address,
+                    number: number,
+                    maxBalance: defaultMaxBalance,
+                    uid: frbsUid
+                  };
+                  //updates is an object that can hold more than one KV pair set
+                  var updates = {};
+
+                  updates['users/' + frbsUid] = userData;
+                  return firebase.database().ref().update(updates);
+                };
+                writeNewUser(frbsUid, name, email, address, number);
+              } else {
+
+              }
+            });
+
+          this.setState({
+            signupModal: !this.state.signupModal
           });
-
-
-            function writeNewUser(uid, name, email, address, number) {
-              // binding to hold all of the initailly gathered user data bindings
-              var userData = {
-                name: name,
-                email: frbsEmail,
-                address: address,
-                number: number,
-                maxBalance: defaultMaxBalance,
-                uid: frbsUid
-              };
-              //updates is an object that can hold more than one KV pair set
-              var updates = {};
-              console.log('writenewuser')
-              updates['users/' + frbsUid] = userData;
-              return firebase.database().ref().update(updates);
-            }
-            writeNewUser(frbsUid, name, email, address, number);
-            console.log(frbsUser)
-            console.log(frbsEmail)
-            console.log(email)
-
     };
 
 
