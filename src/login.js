@@ -10,7 +10,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputEmail: 'garrett.cambre@gmail.com',
+      inputEmail: '1@gmail.com',
       inputPassword:'letmein',
       inputName:'',
       inputAddress:'',
@@ -36,6 +36,7 @@ class Login extends Component {
     this.handleAddressChange = this.handleAddressChange.bind(this);
     this.toggleSignup = this.toggleSignup.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
+
   }
 
     toggle() {
@@ -53,26 +54,36 @@ class Login extends Component {
 
 
     handleSubmit(e){
-      var currentUser = firebase.auth().currentUser;
-      var name;
       e.preventDefault();
       let email = this.state.inputEmail;
       let password = this.state.inputPassword;
       let auth = firebase.auth();
 
+
       auth.signInWithEmailAndPassword(email, password).catch(function(error) {
         var errorCode = error.code;
         var errorMessage = error.message;
       });
+      let frbsUser = auth.currentUser;
+      let frbsName = frbsUser.name;
+      let frbsAcctBalance = frbsUser.accountBalance;
+      let frbsMaxBalance = frbsUser.maxBalance;
 
-      if (currentUser) {
-        console.log(currentUser);
-      }
+        this.setState({
+          modal: !this.state.modal,
+          inputName: frbsName,
+          maxBalance: frbsMaxBalance,
+          isUserLoggedIn: true,
+        })
 
-      this.setState({
-        modal: !this.state.modal
-      })
-    };
+
+
+      auth.onAuthStateChanged(function(frbsUser) {
+          if (frbsUser) {
+      
+          }
+    })
+    }
 
     signout(){
       firebase.auth().signOut().then(function() {
@@ -107,6 +118,9 @@ class Login extends Component {
           var number = this.state.inputNumber;
           var defaultMaxBalance = 300;
           var frbsUser = firebase.auth().currentUser;
+          let frbsName;
+          var frbsMaxBalance;
+
 
           auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
             // Handle Errors here.
@@ -119,7 +133,8 @@ class Login extends Component {
 
                 var frbsEmail = firebase.auth().currentUser.email;
                 var frbsUid = firebase.auth().currentUser.uid;
-                var frbsName = firebase.auth().currentUser.userName;
+                frbsMaxBalance = firebase.auth().currentUser.maxBalance;
+
 
                 var writeNewUser = function(uid, name, email, address, number) {
                   // binding to hold all of the initailly gathered user data bindings
@@ -138,14 +153,18 @@ class Login extends Component {
                   return firebase.database().ref().update(updates);
                 };
                 writeNewUser(frbsUid, name, email, address, number);
-              } else {
+
 
               }
             });
+            let frbsName2 = firebase.auth().currentUser.name;
 
-          this.setState({
-            signupModal: !this.state.signupModal
-          });
+            this.setState({
+              signupModal: !this.state.signupModal,
+              isUserLoggedIn: true,
+              maxBalance: defaultMaxBalance,
+              accountBalance: 10
+            });
     };
 
 
@@ -197,6 +216,8 @@ class Login extends Component {
               handleSignup={this.handleSignup}
               toggleSignup={this.toggleSignup}
               signupModal={this.state.signupModal}
+              maxBalance={this.state.maxBalance}
+              usersName={this.state.inputName}
           />
 
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
@@ -289,7 +310,9 @@ class Login extends Component {
               maxBalance={this.state.maxBalance}
               incrementMaxBalance={this.incrementMaxBalance}
               decrementMaxBalance={this.decrementMaxBalance}
-              userIndex={this.state.userIndex}/>
+              userIndex={this.state.userIndex}
+              accountBalance={this.state.accountBalance}
+              />
         </div>
       );
     }
