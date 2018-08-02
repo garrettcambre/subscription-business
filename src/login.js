@@ -6,6 +6,9 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Signup from './signup';
 import * as firebase from 'firebase';
 
+var doot;
+
+
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +28,7 @@ class Login extends Component {
       signupModal:false,
 
     };
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);//these can all be set to doot in a cleanup day 
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -36,6 +39,7 @@ class Login extends Component {
     this.handleAddressChange = this.handleAddressChange.bind(this);
     this.toggleSignup = this.toggleSignup.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
+    doot=this;
 
   }
 
@@ -58,32 +62,57 @@ class Login extends Component {
       let email = this.state.inputEmail;
       let password = this.state.inputPassword;
       let auth = firebase.auth();
+      var frbsUser
+      var frbsUid
+      var maxBalanceRef
+      var nameRef
+      var accountBalanceRef
 
+      auth.signInWithEmailAndPassword(email, password).then(function(frbsUser) {
+             // Success
+             frbsUser = auth.currentUser
 
-      auth.signInWithEmailAndPassword(email, password).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-      });
-      let frbsUser = auth.currentUser;
-      let frbsName = frbsUser.name;
-      let frbsAcctBalance = frbsUser.accountBalance;
-      let frbsMaxBalance = frbsUser.maxBalance;
+             firebase.auth().onAuthStateChanged(function(frbsUser) {
+                if (frbsUser) {
+                  frbsUid = frbsUser.uid
+                  console.log(frbsUid)
 
-        this.setState({
-          modal: !this.state.modal,
-          inputName: frbsName,
-          maxBalance: frbsMaxBalance,
-          isUserLoggedIn: true,
-        })
+                  maxBalanceRef = firebase.database().ref('users/' + frbsUid + '/maxBalance'),
+                   maxBalanceRef.on('value', function(snapshot) {
+                     doot.setState({
+                       maxBalance: snapshot.val()
+                     })
+                   })
 
+                   nameRef = firebase.database().ref('users/' + frbsUid + '/name'),
+                    nameRef.on('value', function(snapshot) {
+                      doot.setState({
+                        usersName: snapshot.val()
+                      })
+                    })
 
+                   accountBalanceRef = firebase.database().ref('users/' + frbsUid + '/accountBalance'),
+                    accountBalanceRef.on('value', function(snapshot) {
+                      doot.setState({
+                        accountBalance: snapshot.val()
+                      })
+                    })
 
-      auth.onAuthStateChanged(function(frbsUser) {
-          if (frbsUser) {
-      
-          }
-    })
-    }
+                    doot.setState({
+                      modal: !doot.state.modal,
+                      isUserLoggedIn: true,
+                    })
+
+                } else {
+                  console.log('user isnt signed in from handlesubmit')
+                }
+              });
+         }).catch(function(error) {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+
+        });
+      }
 
     signout(){
       firebase.auth().signOut().then(function() {
@@ -91,6 +120,10 @@ class Login extends Component {
       }).catch(function(error) {
         console.log('user not signed out')
       });
+      doot.setState({
+        isUserLoggedIn: false,
+        isAdminLoggedIn: false,
+      })
     }
 
     // after this point these functions are called in child components through props
@@ -116,13 +149,11 @@ class Login extends Component {
           var name = this.state.inputName;
           var address = this.state.inputAddress;
           var number = this.state.inputNumber;
-          var defaultMaxBalance = 300;
-          var frbsUser = firebase.auth().currentUser;
-          let frbsName;
-          var frbsMaxBalance;
+          var frbsUser = auth.currentUser;
+          var defaultMaxBalance=300;
+          var defaultAccountBalance= 10;
 
-
-          auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
+        auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
             // Handle Errors here.
             var errorCode = error.code;
             var errorMessage = error.message;
@@ -131,9 +162,8 @@ class Login extends Component {
           firebase.auth().onAuthStateChanged(function(frbsUser) {
               if (frbsUser) {
 
-                var frbsEmail = firebase.auth().currentUser.email;
-                var frbsUid = firebase.auth().currentUser.uid;
-                frbsMaxBalance = firebase.auth().currentUser.maxBalance;
+                var frbsEmail = frbsUser.email;
+                var frbsUid = frbsUser.uid;
 
 
                 var writeNewUser = function(uid, name, email, address, number) {
@@ -143,6 +173,7 @@ class Login extends Component {
                     email: frbsEmail,
                     address: address,
                     number: number,
+                    accountBalance: defaultAccountBalance,
                     maxBalance: defaultMaxBalance,
                     uid: frbsUid
                   };
@@ -157,13 +188,13 @@ class Login extends Component {
 
               }
             });
-            let frbsName2 = firebase.auth().currentUser.name;
 
             this.setState({
               signupModal: !this.state.signupModal,
               isUserLoggedIn: true,
               maxBalance: defaultMaxBalance,
-              accountBalance: 10
+              usersName: this.state.inputName,
+              accountBalance: defaultAccountBalance,
             });
     };
 
@@ -194,7 +225,9 @@ class Login extends Component {
     search(userList);
     };
 
-
+componentDidMount(){
+  firebase.auth().signOut();
+}
 
   render(){
       if (!this.state.isAdminLoggedIn && !this.state.isUserLoggedIn){
@@ -217,7 +250,7 @@ class Login extends Component {
               toggleSignup={this.toggleSignup}
               signupModal={this.state.signupModal}
               maxBalance={this.state.maxBalance}
-              usersName={this.state.inputName}
+              usersName={this.state.usersName}
           />
 
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
@@ -244,7 +277,7 @@ class Login extends Component {
         </div>
 
           <br/>
-          <button onClick={this.signout}>signout</button>
+
           <Home/>
         </div>
       );
@@ -274,6 +307,8 @@ class Login extends Component {
               </Modal>
             </div>
 
+            <button onClick={this.signout}>signout</button>
+
             <br/>
               <AdminPage isAdminLoggedIn={this.state.isAdminLoggedIn}/>
           </div>
@@ -281,28 +316,7 @@ class Login extends Component {
     }else{
       return (
         <div>
-            <div>
-              <Button color="danger" onClick={this.toggle}>Login</Button>
-              <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
-                <ModalBody>
-                    <div className='UserLogin'>
-                      <form  >
-                        <p>email</p>
-                        <input type='text'  onChange={this.handleEmailChange} value={this.state.inputEmail}/>
-                        <br/>
-                        <p>password</p>
-                        <input type= 'text' onChange={this.handlePasswordChange} value={this.state.inputPassword}/>
-                        <br/><br/>
-                      </form>
-                    </div>
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="primary"  onClick={this.handleSubmit}>Do Something</Button>{' '}
-                  <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                </ModalFooter>
-              </Modal>
-            </div>
+          <button onClick={this.signout}>signout</button>
           <br/>
             <UserPage
               accountBalance={this.state.accountBalance}
@@ -311,7 +325,6 @@ class Login extends Component {
               incrementMaxBalance={this.incrementMaxBalance}
               decrementMaxBalance={this.decrementMaxBalance}
               userIndex={this.state.userIndex}
-              accountBalance={this.state.accountBalance}
               />
         </div>
       );
