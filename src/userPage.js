@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import NavClass from './navbar';
 import { Progress } from 'reactstrap';
 import RequestButton from './requestButton'
+
 class UserPage extends Component{
   constructor(props){
     super(props);
@@ -12,6 +13,7 @@ class UserPage extends Component{
 
     }
   }
+
 render(){
   return(
     <div>

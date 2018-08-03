@@ -7,7 +7,11 @@ import Signup from './signup';
 import * as firebase from 'firebase';
 
 var doot;
-
+var frbsUid;
+var maxBalanceRef;
+var frbsUser;
+var auth;
+var maxBalanceRefB
 
 class Login extends Component {
   constructor(props) {
@@ -28,7 +32,7 @@ class Login extends Component {
       signupModal:false,
 
     };
-    this.handleSubmit = this.handleSubmit.bind(this);//these can all be set to doot in a cleanup day 
+    this.handleSubmit = this.handleSubmit.bind(this);//these can all be set to doot in a cleanup day
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -61,12 +65,9 @@ class Login extends Component {
       e.preventDefault();
       let email = this.state.inputEmail;
       let password = this.state.inputPassword;
-      let auth = firebase.auth();
-      var frbsUser
-      var frbsUid
-      var maxBalanceRef
       var nameRef
       var accountBalanceRef
+      auth = firebase.auth();
 
       auth.signInWithEmailAndPassword(email, password).then(function(frbsUser) {
              // Success
@@ -82,7 +83,14 @@ class Login extends Component {
                      doot.setState({
                        maxBalance: snapshot.val()
                      })
+                     return snapshot.val()
                    })
+                   maxBalanceRefB = firebase.database().ref('users/' + frbsUid + '/maxBalance'),
+                    maxBalanceRefB.on('value', function(snapshot) {
+                      return snapshot.val()
+                    })
+
+
 
                    nameRef = firebase.database().ref('users/' + frbsUid + '/name'),
                     nameRef.on('value', function(snapshot) {
@@ -145,11 +153,11 @@ class Login extends Component {
     handleSignup(){
           var email = this.state.inputEmail;
           var password = this.state.inputPassword;
-          var auth = firebase.auth();
+          auth = firebase.auth();
+          frbsUser = auth.currentUser;
           var name = this.state.inputName;
           var address = this.state.inputAddress;
           var number = this.state.inputNumber;
-          var frbsUser = auth.currentUser;
           var defaultMaxBalance=300;
           var defaultAccountBalance= 10;
 
@@ -159,7 +167,7 @@ class Login extends Component {
             var errorMessage = error.message;
           });
 
-          firebase.auth().onAuthStateChanged(function(frbsUser) {
+          auth.onAuthStateChanged(function(frbsUser) {
               if (frbsUser) {
 
                 var frbsEmail = frbsUser.email;
@@ -202,27 +210,49 @@ class Login extends Component {
 
 
     incrementMaxBalance(){
-      let search=(objectArray )=>{
-      let i;
-      for(i=0; i<objectArray.length; i++){
-        if(objectArray[i].email === this.state.inputEmail)
-        objectArray[i].maxBalance += 10
-        return   this.setState({maxBalance: userList[i].maxBalance})
-      }
-    }
-    search(userList);
-    };
+      var foo;
+      auth = firebase.auth();
+      frbsUser = auth.currentUser
+      frbsUid = frbsUser.uid
+      let  readMaxBalance=()=>{
+        firebase.database().ref('/users/' + frbsUid ).once('value').then(function(snapshot) {
+          foo = snapshot.val().maxBalance;
 
-    decrementMaxBalance(){
-      let search=(objectArray, value=10 )=>{
-      let i;
-      for(i=0; i<objectArray.length; i++){
-        if(objectArray[i].email === this.state.inputEmail)
-        objectArray[i].maxBalance -= value
-        return   this.setState({maxBalance: userList[i].maxBalance})
+          let bar = foo +=10;
+          var newMaxBalance = {}
+          newMaxBalance['/users/' + frbsUid + '/maxBalance']= bar
+
+          doot.setState({
+            maxBalance:  bar
+          })
+          firebase.database().ref().update(newMaxBalance);
+          })
       }
+      readMaxBalance();
     }
-    search(userList);
+
+    decrementMaxBalance(){//this is copypasted from incrementmaxbalance but it is just sligntly chnged binding names and changed to subtract
+      var fooLess;
+      auth = firebase.auth();
+      frbsUser = auth.currentUser
+      frbsUid = frbsUser.uid
+      let  readMaxBalance=()=>{
+        firebase.database().ref('/users/' + frbsUid ).once('value').then(function(snapshot) {
+          fooLess = snapshot.val().maxBalance;
+
+
+          let barLess = fooLess -=10;
+          var newMaxBalance = {}
+          newMaxBalance['/users/' + frbsUid + '/maxBalance']= barLess
+
+          doot.setState({
+            maxBalance:  barLess
+          })
+          firebase.database().ref().update(newMaxBalance);
+          })
+      }
+      readMaxBalance();
+
     };
 
 componentDidMount(){
@@ -331,62 +361,5 @@ componentDidMount(){
     }
   }
 };
-
-
-let userList = [
-  {
-    "_id": "5b3e5eb4c37e380e7a73ee93",
-    "index": 0,
-    "guid": "d873815c-011b-4778-8ce6-edc20a924aa5",
-    "isActive": false,
-    "balance": 157.56,
-    "maxBalance":500,
-    "picture": "http://placehold.it/32x32",
-    "age": 50,
-    "name": "Bridgett Hampton",
-    "gender": "female",
-    "email": "bridgetthampton@quinex.com",
-    "password": "non",
-    "phone": "+1 (829) 412-2012",
-    "address": "872 Clay Street, Cincinnati, Ohio, 20681",
-    "registered": "04-21-2014 T04:51:22 +04:00"
-  },
-  {
-    "_id": "5b3e5eb4e93fbcd63a69b655",
-    "index": 1,
-    "guid": "511d18bf-d229-4f37-b641-78bba0e3a6f1",
-    "isActive": false,
-    "balance": 311.22,
-    "maxBalance":500,
-    "picture": "http://placehold.it/32x32",
-    "age": 36,
-    "name": "Angelia Hartman",
-    "gender": "female",
-    "email": "angeliahartman@quinex.com",
-    "password": "dolore",
-    "phone": "+1 (862) 446-3205",
-    "address": "158 Newkirk Avenue, Cincinnati, Ohio, 46064",
-    "registered": "05-25-2018 T09:41:55 +04:00"
-  },
-  {
-    "_id": "5b3e5eb47a62f9e71efc40f7",
-    "index": 2,
-    "guid": "c04efc6d-4bc0-440b-ac33-1b5b5d4a3461",
-    "isActive": false,
-    "balance": 255.67,
-    "maxBalance":500,
-    "picture": "http://placehold.it/32x32",
-    "age": 22,
-    "name": "Josephine Meyers",
-    "gender": "female",
-    "email": "josephinemeyers@quinex.com",
-    "password": "id",
-    "phone": "+1 (927) 464-2235",
-    "address": "239 Ridgecrest Terrace, Cincinnati, Ohio, 58364",
-    "registered": "09-29-2017 T06:36:35 +04:00"
-  }
-]
-
-
 
 export default Login;
