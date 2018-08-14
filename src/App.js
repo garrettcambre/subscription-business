@@ -2,15 +2,13 @@ import React, { Component } from 'react';
 import Login from './login';
 import Footer from './footer';
 import { Row, Col} from 'reactstrap';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase'; //this throws an error but it allows the app to use firebase so dont delete :"'firebase' is defined but never used"
 import './App.css';
 
 class App extends Component {
   constructor(props){
     super(props)
     this.state={
-      users:[],
-
     }
   };
 

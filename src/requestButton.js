@@ -22,15 +22,15 @@ class RequestButton extends Component{
 render(){
   return(
     <div>
-      <Button onClick={this.toggle}>button</Button>
+      <Button onClick={this.toggle}>Request Service</Button>
       <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-        <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+        <ModalHeader toggle={this.toggle}>Service Request</ModalHeader>
         <ModalBody>
             <h1>{this.state.data}</h1>
+            <h1>sorry, this site is under construction and this feature is still unavailable :(</h1>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={this.toggle}>Submit Request</Button>{' '}
-          <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+          <Button color="primary" onClick={this.toggle}>okay</Button>          
         </ModalFooter>
       </Modal>
     </div>

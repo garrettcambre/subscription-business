@@ -28,6 +28,7 @@ render(){
          <br/>
          <br/>
          <h3>your account balance is: ${this.props.accountBalance}</h3>
+         <h4> your maximum account balance is ${this.props.maxBalance}</h4>
          <div>
            <div className="text-center">
            <RequestButton userIndex={this.props.userIndex}/>

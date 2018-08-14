@@ -13,11 +13,9 @@ render(){
   return(
     <div>
         <Navbar color="light" light expand="md">
-          <NavbarBrand href="/">reactstrap</NavbarBrand>
+          <NavbarBrand href="/">QuickHelp</NavbarBrand>
             <Nav className="ml-auto" navbar>
-              <NavItem>
-                <NavLink href="/">admin option</NavLink>
-              </NavItem>
+
               <NavItem>
               option2
                 <NavLink href="/">GitHub</NavLink>
@@ -30,13 +28,11 @@ render(){
   return(
     <div>
         <Navbar color="light" light expand="md">
-          <NavbarBrand href="/">reactstrap</NavbarBrand>
+          <NavbarBrand href="/">QuickHelp</NavbarBrand>
             <Nav className="ml-auto" navbar>
+              
               <NavItem>
-                <NavLink href="/">Nonadmin Option</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="/">GitHub</NavLink>
+                <NavLink href="https://github.com/garrettcambre">GitHub</NavLink>
               </NavItem>
             </Nav>
         </Navbar>

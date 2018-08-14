@@ -32,8 +32,8 @@ class Login extends Component {
       signupModal:false,
 
     };
-    this.handleSubmit = this.handleSubmit.bind(this);//these can all be set to doot in a cleanup day
-    this.handleEmailChange = this.handleEmailChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);//these can all be set to doot in a cleanup day(i think, some scope may be slightly different),
+    this.handleEmailChange = this.handleEmailChange.bind(this);// see lines 109-112 for an example
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.toggle = this.toggle.bind(this);
     this.incrementMaxBalance = this.incrementMaxBalance.bind(this);
@@ -78,28 +78,28 @@ class Login extends Component {
                   frbsUid = frbsUser.uid
                   console.log(frbsUid)
 
-                  maxBalanceRef = firebase.database().ref('users/' + frbsUid + '/maxBalance'),
+                  maxBalanceRef = firebase.database().ref('users/' + frbsUid + '/maxBalance')
                    maxBalanceRef.on('value', function(snapshot) {
                      doot.setState({
                        maxBalance: snapshot.val()
                      })
                      return snapshot.val()
                    })
-                   maxBalanceRefB = firebase.database().ref('users/' + frbsUid + '/maxBalance'),
+                   maxBalanceRefB = firebase.database().ref('users/' + frbsUid + '/maxBalance')
                     maxBalanceRefB.on('value', function(snapshot) {
                       return snapshot.val()
                     })
 
 
 
-                   nameRef = firebase.database().ref('users/' + frbsUid + '/name'),
+                   nameRef = firebase.database().ref('users/' + frbsUid + '/name')
                     nameRef.on('value', function(snapshot) {
                       doot.setState({
                         usersName: snapshot.val()
                       })
                     })
 
-                   accountBalanceRef = firebase.database().ref('users/' + frbsUid + '/accountBalance'),
+                   accountBalanceRef = firebase.database().ref('users/' + frbsUid + '/accountBalance')
                     accountBalanceRef.on('value', function(snapshot) {
                       doot.setState({
                         accountBalance: snapshot.val()
@@ -116,8 +116,8 @@ class Login extends Component {
                 }
               });
          }).catch(function(error) {
-          var errorCode = error.code;
-          var errorMessage = error.message;
+        //  var errorCode = error.code;  this is automatically part of firebase finction, I have not used it yet
+        //  var errorMessage = error.message;
 
         });
       }
@@ -163,8 +163,8 @@ class Login extends Component {
 
         auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
             // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
+        //    var errorCode = error.code;
+        //    var errorMessage = error.message;
           });
 
           auth.onAuthStateChanged(function(frbsUser) {
@@ -192,8 +192,6 @@ class Login extends Component {
                   return firebase.database().ref().update(updates);
                 };
                 writeNewUser(frbsUid, name, email, address, number);
-
-
               }
             });
 
@@ -205,8 +203,6 @@ class Login extends Component {
               accountBalance: defaultAccountBalance,
             });
     };
-
-
 
 
     incrementMaxBalance(){
@@ -229,7 +225,7 @@ class Login extends Component {
           })
       }
       readMaxBalance();
-    }
+    };
 
     decrementMaxBalance(){//this is copypasted from incrementmaxbalance but it is just sligntly chnged binding names and changed to subtract
       var fooLess;
@@ -239,7 +235,6 @@ class Login extends Component {
       let  readMaxBalance=()=>{
         firebase.database().ref('/users/' + frbsUid ).once('value').then(function(snapshot) {
           fooLess = snapshot.val().maxBalance;
-
 
           let barLess = fooLess -=10;
           var newMaxBalance = {}
@@ -252,7 +247,6 @@ class Login extends Component {
           })
       }
       readMaxBalance();
-
     };
 
 componentDidMount(){
@@ -264,32 +258,38 @@ componentDidMount(){
       return (
         <div>
         <div>
-          <Button color="danger" onClick={this.toggle}>Login</Button>
-          <Signup
-              handleEmailChange={this.handleEmailChange}
-              handlePasswordChange={this.handlePasswordChange}
-              handleAddressChange={this.handleAddressChange}
-              handleNameChange={this.handleNameChange}
-              handleNumberChange={this.handleNumberChange}
-              inputName={this.state.inputName}
-              inputEmail={this.state.inputEmail}
-              inputNumber={this.state.inputNumber}
-              inputAddress={this.state.inputAddress}
-              inputPassword={this.state.inputPassword}
-              handleSignup={this.handleSignup}
-              toggleSignup={this.toggleSignup}
-              signupModal={this.state.signupModal}
-              maxBalance={this.state.maxBalance}
-              usersName={this.state.usersName}
-          />
+          <div className= "authButtons">
+            <span className="loginButton">
+              <Button color="danger"  onClick={this.toggle}>Login</Button>
+            </span>
 
+            <Signup
+                handleEmailChange={this.handleEmailChange}
+                handlePasswordChange={this.handlePasswordChange}
+                handleAddressChange={this.handleAddressChange}
+                handleNameChange={this.handleNameChange}
+                handleNumberChange={this.handleNumberChange}
+                inputName={this.state.inputName}
+                inputEmail={this.state.inputEmail}
+                inputNumber={this.state.inputNumber}
+                inputAddress={this.state.inputAddress}
+                inputPassword={this.state.inputPassword}
+                handleSignup={this.handleSignup}
+                toggleSignup={this.toggleSignup}
+                signupModal={this.state.signupModal}
+                maxBalance={this.state.maxBalance}
+                usersName={this.state.usersName}
+            />
+            </div>
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-            <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+            <ModalHeader toggle={this.toggle}>Login</ModalHeader>
             <ModalBody>
                 <div className='UserLogin'>
                   <form  >
                     <p>email</p>
                     <input type='text'  onChange={this.handleEmailChange} value={this.state.inputEmail}/>
+                    <br/>
+                    <br/>
                     <br/>
                     <p>password</p>
                     <input type= 'text' onChange={this.handlePasswordChange} value={this.state.inputPassword}/>
@@ -298,7 +298,7 @@ componentDidMount(){
                 </div>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={this.handleSubmit}>Do Something</Button>{' '}
+              <Button color="primary" onClick={this.handleSubmit}>submit</Button>{' '}
               <Button color="secondary" onClick={this.toggle}>Cancel</Button>
             </ModalFooter>
           </Modal>
