@@ -17,8 +17,8 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputEmail: '1@gmail.com',
-      inputPassword:'letmein',
+      inputEmail:'' ,
+      inputPassword:'',
       inputName:'',
       inputAddress:'',
       inputNumber:'',
@@ -43,6 +43,7 @@ class Login extends Component {
     this.handleAddressChange = this.handleAddressChange.bind(this);
     this.toggleSignup = this.toggleSignup.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
     doot=this;
 
   }
@@ -131,6 +132,9 @@ class Login extends Component {
       doot.setState({
         isUserLoggedIn: false,
         isAdminLoggedIn: false,
+        inputEmail:'' ,
+        inputPassword:''
+
       })
     }
 
@@ -251,6 +255,7 @@ class Login extends Component {
 
 componentDidMount(){
   firebase.auth().signOut();
+
 }
 
   render(){
