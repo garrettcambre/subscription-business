@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import AdminPage from './adminPage';
 import UserPage from './userPage';
+import ContractorPage from './contractorPage';
 import Home from './home';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Signup from './signup';
@@ -11,25 +12,69 @@ var frbsUid;
 var maxBalanceRef;
 var frbsUser;
 var auth;
-var maxBalanceRefB
+var frbsEmail
+
+
+var getPaddedDate = function(){
+  var now = new Date();
+    let getPaddedDay = function(){
+      let day = now.getDate();
+      if(day < 10){
+        return "0"+JSON.stringify(day)
+      }else{
+        return JSON.stringify(day)
+      }
+    };
+
+    let getPaddedMonth = function(){
+      let adjMonth = now.getMonth() +1;
+      if(adjMonth < 10){
+        return  "0"+JSON.stringify(adjMonth)
+      } else{
+        return JSON.stringify(adjMonth)
+      }
+    };
+
+    let year = function(){
+      return JSON.stringify(now.getFullYear())
+    };
+
+    console.log(year()+'-'+getPaddedMonth()+'-'+getPaddedDay())
+
+    doot.setState({
+      today: year()+'-'+getPaddedMonth()+'-'+getPaddedDay()
+    })
+    return  year()+'-'+getPaddedMonth()+'-'+getPaddedDay()
+}
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputEmail:'' ,
-      inputPassword:'',
+      //controlled by user input in signup
+      signupModal:false,
+      inputEmail:'1@gmail.com' ,//handles login as well
+      inputPassword:'letmein',//handles login as well
       inputName:'',
       inputAddress:'',
       inputNumber:'',
+      //control the auth state outside of firebase.auth()
       isUserLoggedIn: false,
       isAdminLoggedIn: false,
-      modal: false,
+      isContractorLoggedIn: false,
+      //handle the mutation max acct balance in userpage
       accountBalance: '',
       maxBalance: '',
       usersName: '',
-      usersIndex: '',
-      signupModal:false,
+      //loginModal
+      modal: false,
+      //request button
+      requestModal:false,
+      requestDate: '',
+      requestDropdownValue:.5,
+      usersNumber:'',
+      today:'',
+      usersAddress:'',
 
     };
     this.handleSubmit = this.handleSubmit.bind(this);//these can all be set to doot in a cleanup day(i think, some scope may be slightly different),
@@ -50,7 +95,7 @@ class Login extends Component {
 
     toggle() {
     this.setState({
-      modal: !this.state.modal
+      loginModal: !this.state.loginModal
     });
     }
     handleEmailChange(e){
@@ -68,6 +113,10 @@ class Login extends Component {
       let password = this.state.inputPassword;
       var nameRef
       var accountBalanceRef
+      var adminRef
+      var contractorRef
+      var addressRef
+      var numberRef
       auth = firebase.auth();
 
       auth.signInWithEmailAndPassword(email, password).then(function(frbsUser) {
@@ -86,11 +135,20 @@ class Login extends Component {
                      })
                      return snapshot.val()
                    })
-                   maxBalanceRefB = firebase.database().ref('users/' + frbsUid + '/maxBalance')
-                    maxBalanceRefB.on('value', function(snapshot) {
+                   addressRef = firebase.database().ref('users/' + frbsUid + '/address')//used for requests
+                    addressRef.on('value', function(snapshot) {
+                      doot.setState({
+                        usersAddress: snapshot.val()
+                      })
                       return snapshot.val()
                     })
-
+                    numberRef = firebase.database().ref('users/' + frbsUid + '/number')//used for requests
+                     numberRef.on('value', function(snapshot) {
+                       doot.setState({
+                         usersNumber: snapshot.val()
+                       })
+                       return snapshot.val()
+                     })
 
 
                    nameRef = firebase.database().ref('users/' + frbsUid + '/name')
@@ -107,11 +165,30 @@ class Login extends Component {
                       })
                     })
 
-                    doot.setState({
-                      modal: !doot.state.modal,
-                      isUserLoggedIn: true,
+                  adminRef = firebase.database().ref('users/' + frbsUid + '/isAdmin')
+                   adminRef.on('value', function(snapshot) {
+                     doot.setState({
+                       isAdminLoggedIn: snapshot.val()
+                     })
+                   })
+
+                   contractorRef = firebase.database().ref('users/' + frbsUid + '/isContractor')
+                    contractorRef.on('value', function(snapshot) {
+                      doot.setState({
+                        isContractorLoggedIn: snapshot.val()
+                      })
                     })
 
+                    if (doot.state.isAdminLoggedIn || doot.state.isContractorLoggedIn){
+                      doot.setState({
+                        loginModal: !doot.state.loginModal,
+                      })
+                    }else{
+                      doot.setState({
+                        loginModal: !doot.state.loginModal,
+                        isUserLoggedIn: true,
+                      })
+                    }
                 } else {
                   console.log('user isnt signed in from handlesubmit')
                 }
@@ -133,7 +210,10 @@ class Login extends Component {
         isUserLoggedIn: false,
         isAdminLoggedIn: false,
         inputEmail:'' ,
-        inputPassword:''
+        inputPassword:'',
+        inputName:'',
+        inputNumber:'',
+        inputAddress:''
 
       })
     }
@@ -174,12 +254,13 @@ class Login extends Component {
           auth.onAuthStateChanged(function(frbsUser) {
               if (frbsUser) {
 
-                var frbsEmail = frbsUser.email;
-                var frbsUid = frbsUser.uid;
+                frbsEmail = frbsUser.email;
+                frbsUid = frbsUser.uid;
 
 
                 var writeNewUser = function(uid, name, email, address, number) {
                   // binding to hold all of the initailly gathered user data bindings
+                  let now = new Date()
                   var userData = {
                     name: name,
                     email: frbsEmail,
@@ -187,7 +268,10 @@ class Login extends Component {
                     number: number,
                     accountBalance: defaultAccountBalance,
                     maxBalance: defaultMaxBalance,
-                    uid: frbsUid
+                    uid: frbsUid,
+                    isAdmin: false,
+                    isContractor: false,
+                    added: now
                   };
                   //updates is an object that can hold more than one KV pair set
                   var updates = {};
@@ -253,13 +337,98 @@ class Login extends Component {
       readMaxBalance();
     };
 
+    //request button functions
+
+    requestToggle(){
+      doot.setState({
+        requestModal: !doot.state.requestModal
+      });
+    };
+
+
+
+
+
+    requestSubmit(){
+      var requestUid
+      var userRequestData
+      var requestData
+      var updateRequests
+      var now = new Date()
+      auth = firebase.auth();
+      frbsUser = auth.currentUser;
+      frbsUid = frbsUser.uid
+      frbsEmail = frbsUser.email;
+
+      //firebase database update in both requests and individuals request list
+        var writeNewRequest = function() {
+
+          requestUid = firebase.database().ref().child('requests').push().key;
+          // binding to hold all of the initailly gathered user data bindings
+
+          userRequestData = {
+            name: doot.state.usersName,
+            email: frbsEmail,
+            address: doot.state.usersAddress,//set inside login function
+            number: doot.state.usersNumber,//set inside login function
+            requestSubmittedAt: now,
+            userUid: frbsUid,
+            requestUid: requestUid,
+            requestDate:doot.state.requestDate,
+            requestHours:doot.state.requestDropdownValue,
+          };
+
+          requestData = {
+            requestUid: requestUid,
+            requestSubmittedAt: now,
+            requestDate:doot.state.requestDate,
+            requestHours:doot.state.requestDropdownValue,
+          };
+
+          updateRequests = {};
+
+          updateRequests['/requests/'+ requestUid] = userRequestData;
+          updateRequests['/users/'+ frbsUid + '/requestsHistory/' + requestUid] = requestData;
+
+          firebase.database().ref().update(updateRequests)
+          alert('request submitted!')
+        };
+
+      writeNewRequest();
+
+      doot.setState({
+        requestModal:false
+      });
+    };
+
+
+    requestDateChange(e){
+      doot.setState({
+        requestDate: e.target.value,
+      })
+    };
+
+    handleRequestDropdown(e){
+      doot.setState({
+        requestDropdownValue: e.target.value
+      })
+    };
+
+
+  componentWillMount(){
+      getPaddedDate()
+    }
+
+
+//login componentDidMount
 componentDidMount(){
   firebase.auth().signOut();
+
 
 }
 
   render(){
-      if (!this.state.isAdminLoggedIn && !this.state.isUserLoggedIn){
+      if (!this.state.isAdminLoggedIn && !this.state.isUserLoggedIn && !this.state.isContractorLoggedIn){
       return (
         <div>
         <div>
@@ -284,9 +453,10 @@ componentDidMount(){
                 signupModal={this.state.signupModal}
                 maxBalance={this.state.maxBalance}
                 usersName={this.state.usersName}
+
             />
             </div>
-          <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
+          <Modal isOpen={this.state.loginModal} toggle={this.toggle} className={this.props.className}>
             <ModalHeader toggle={this.toggle}>Login</ModalHeader>
             <ModalBody>
                 <div className='UserLogin'>
@@ -319,33 +489,21 @@ componentDidMount(){
     }else if(this.state.isAdminLoggedIn){
         return (
           <div>
-            <div>
-              <Button color="danger" onClick={this.toggle}>Login</Button>
-              <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
-                <ModalBody>
-                    <div className='UserLogin'>
-                      <form  >
-                        <p>email</p>
-                        <input type='text'  onChange={this.handleEmailChange} value={this.state.inputEmail}/>
-                        <br/>
-                        <p>password</p>
-                        <input type= 'text' onChange={this.handlePasswordChange} value={this.state.inputPassword}/>
-                        <br/><br/>
-                      </form>
-                    </div>
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="primary" onClick={this.handleSubmit}>Do Something</Button>{' '}
-                  <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                </ModalFooter>
-              </Modal>
-            </div>
 
             <button onClick={this.signout}>signout</button>
 
             <br/>
               <AdminPage isAdminLoggedIn={this.state.isAdminLoggedIn}/>
+          </div>
+        );
+    }else if(this.state.isContractorLoggedIn){
+        return (
+          <div>
+
+            <button onClick={this.signout}>signout</button>
+
+            <br/>
+              <ContractorPage isContractorLoggedIn={this.state.isContractorLoggedIn}/>
           </div>
         );
     }else{
@@ -359,7 +517,14 @@ componentDidMount(){
               maxBalance={this.state.maxBalance}
               incrementMaxBalance={this.incrementMaxBalance}
               decrementMaxBalance={this.decrementMaxBalance}
-              userIndex={this.state.userIndex}
+              requestModal={this.state.requestModal}
+              requestToggle={this.requestToggle}
+              requestDate={this.state.requestDate}
+              requestSubmit={this.requestSubmit}
+              requestDateChange={this.requestDateChange}
+              today={this.state.today}
+              handleRequestDropdown={this.handleRequestDropdown}
+
               />
         </div>
       );

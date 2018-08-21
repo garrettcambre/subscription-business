@@ -76,3 +76,65 @@
    }
  }
   userQuery(userList, this.state);*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  var accountBalRef = firebase.database().ref('users/' + frbsUid + '/accountBalance');
+   accountBalRef.on('value', function(snapshot) {
+     console.log("accountbalref  " + snapshot.val())
+ });
+
+ var addressRef = function(){
+   firebase.database().ref('users/' + frbsUid + '/address');
+    addressRef.on('value', function(snapshot) {
+      doot.setState({
+        usersAddress:snapshot.val(),
+      })
+      console.log("addressRef  " + snapshot.val());
+
+
+  })
+ };
+
+
+ var readNumberOnce = function(){//newest
+ return firebase.database().ref('/users/' + frbsUid).once('value').then(function(snapshot) {
+   usrNumber = (snapshot.val() && snapshot.val().number) || 'Anonymous';
+   doot.setState({
+     usersNumber: usrNumber,
+   })
+ });
+ }
+ readNumberOnce();
+ console.log("second number binding "+usrNumber)
+
+
+ var numberRef = firebase.database().ref('users/' + frbsUid + '/number');
+   numberRef.on('value', function(snapshot) {
+     doot.setState({
+       usersNumber: snapshot.val(),
+     })
+ });
+
+ console.log("theusersnumberState  " + doot.state.usersNumber),
