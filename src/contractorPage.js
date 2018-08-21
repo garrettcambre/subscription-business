@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import NavClass from './navbar';
-
+import RequestScroll from './requestScroll';
 
 class ContractorPage extends Component{
   constructor(props){
@@ -27,6 +27,7 @@ render(){
          <br/>
          <br/>
          <h1>youre a contractor</h1>
+         <RequestScroll />
 
     </div>
 

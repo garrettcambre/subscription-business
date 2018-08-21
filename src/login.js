@@ -53,8 +53,8 @@ class Login extends Component {
     this.state = {
       //controlled by user input in signup
       signupModal:false,
-      inputEmail:'1@gmail.com' ,//handles login as well
-      inputPassword:'letmein',//handles login as well
+      inputEmail:'' ,//handles login as well
+      inputPassword:'',//handles login as well
       inputName:'',
       inputAddress:'',
       inputNumber:'',
