@@ -52,7 +52,7 @@ var getPaddedDate = function(){
 class Login extends Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = {// ONCHANGE if anything is added make sure to add it to signout setstate call
       //controlled by user input in signup
       signupModal:false,
       inputEmail:'' ,//handles login as well
@@ -209,13 +209,26 @@ class Login extends Component {
         console.log('user not signed out')
       });
       doot.setState({
-        isUserLoggedIn: false,
-        isAdminLoggedIn: false,
+        signupModal:false, //full application state cleared
         inputEmail:'' ,
         inputPassword:'',
         inputName:'',
+        inputAddress:'',
         inputNumber:'',
-        inputAddress:''
+        isUserLoggedIn: false,
+        isAdminLoggedIn: false,
+        isContractorLoggedIn: false,
+        accountBalance: '',
+        maxBalance: '',
+        usersName: '',
+        modal: false,
+        requestModal:false,
+        requestDate: '',
+        requestDropdownValue:.5,
+        usersNumber:'',
+        today:'',
+        usersAddress:'',
+
 
       })
     }
