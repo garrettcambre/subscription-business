@@ -13,6 +13,8 @@ var maxBalanceRef;
 var frbsUser;
 var auth;
 var frbsEmail
+var addressRef
+var numberRef
 
 
 var getPaddedDate = function(){
@@ -245,6 +247,7 @@ class Login extends Component {
           var defaultMaxBalance=300;
           var defaultAccountBalance= 10;
 
+
         auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
             // Handle Errors here.
         //    var errorCode = error.code;
@@ -280,6 +283,21 @@ class Login extends Component {
                   return firebase.database().ref().update(updates);
                 };
                 writeNewUser(frbsUid, name, email, address, number);
+
+                addressRef = firebase.database().ref('users/' + frbsUid + '/address')//used for requests
+                 addressRef.on('value', function(snapshot) {
+                   doot.setState({
+                     usersAddress: snapshot.val()
+                   })
+                   return snapshot.val()
+                 })
+                 numberRef = firebase.database().ref('users/' + frbsUid + '/number')//used for requests
+                  numberRef.on('value', function(snapshot) {
+                    doot.setState({
+                      usersNumber: snapshot.val()
+                    })
+                    return snapshot.val()
+                  })
               }
             });
 
