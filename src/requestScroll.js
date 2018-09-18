@@ -14,7 +14,7 @@ class UserPage extends Component{
     }
   }
 
-componentWillMount(){
+componentWillMount( ){
 
 
 

@@ -41,8 +41,6 @@ var getPaddedDate = function(){
       return JSON.stringify(now.getFullYear())
     };
 
-    console.log(year()+'-'+getPaddedMonth()+'-'+getPaddedDay())
-
     doot.setState({
       today: year()+'-'+getPaddedMonth()+'-'+getPaddedDay()
     })
@@ -55,8 +53,8 @@ class Login extends Component {
     this.state = {// ONCHANGE if anything is added make sure to add it to signout setstate call
       //controlled by user input in signup
       signupModal:false,
-      inputEmail:'' ,//handles login as well
-      inputPassword:'',//handles login as well
+      inputEmail:'contractor1@gmail.com' ,//handles login as well
+      inputPassword:'letmein',//handles login as well
       inputName:'',
       inputAddress:'',
       inputNumber:'',
@@ -77,6 +75,8 @@ class Login extends Component {
       usersNumber:'',
       today:'',
       usersAddress:'',
+      //contractor page
+      recentRequests:[],
 
     };
     this.handleSubmit = this.handleSubmit.bind(this);//these can all be set to doot in a cleanup day(i think, some scope may be slightly different),
@@ -107,7 +107,6 @@ class Login extends Component {
     handlePasswordChange(e){
       this.setState({inputPassword: e.target.value});
     };
-
 
     handleSubmit(e){
       e.preventDefault();
@@ -228,6 +227,7 @@ class Login extends Component {
         usersNumber:'',
         today:'',
         usersAddress:'',
+        recentRequests:'',
 
 
       })
@@ -272,6 +272,7 @@ class Login extends Component {
 
                 frbsEmail = frbsUser.email;
                 frbsUid = frbsUser.uid;
+                console.log(frbsUid)
 
 
                 var writeNewUser = function(uid, name, email, address, number) {
@@ -323,12 +324,13 @@ class Login extends Component {
             });
     };
 
-
     incrementMaxBalance(){
       var foo;
       auth = firebase.auth();
       frbsUser = auth.currentUser
       frbsUid = frbsUser.uid
+      console.log('increment')
+      console.log(frbsUid)
       let  readMaxBalance=()=>{
         firebase.database().ref('/users/' + frbsUid ).once('value').then(function(snapshot) {
           foo = snapshot.val().maxBalance;
@@ -375,10 +377,6 @@ class Login extends Component {
         requestModal: !doot.state.requestModal
       });
     };
-
-
-
-
 
     requestSubmit(){
       var requestUid
@@ -432,7 +430,6 @@ class Login extends Component {
       });
     };
 
-
     requestDateChange(e){
       doot.setState({
         requestDate: e.target.value,
@@ -448,12 +445,54 @@ class Login extends Component {
 
   componentWillMount(){
       getPaddedDate()
-    }
+      function snapshotToArray(snapshot) {
+          var returnArr = [];
+
+          snapshot.forEach(function(childSnapshot) {
+              var item = []
+              var index = childSnapshot.val();
+              console.log(index);
+              index.key = childSnapshot.key;
+              console.log(index.key);
 
 
+              childSnapshot.forEach(function(child){
+                console.log(child.val());
+                console.log(child.key)
+                item.push(child.key+" : "+child.val());
+              })
+
+              returnArr.push(item);
+          });
+
+          return returnArr;
+      };
+
+
+
+  var recentRequestsRef = firebase.database().ref('requests')
+  .limitToLast(4)
+    recentRequestsRef.on('value', snapshot => {
+      /* Update React state when message is added at Firebase Database */
+      let request = { object: snapshot.val(),
+                      id: snapshot.key
+                    };
+      doot.setState({ recentRequests: [request].concat(doot.state.recentRequests) });
+  })
+
+
+}
 //login componentDidMount
 componentDidMount(){
   firebase.auth().signOut();
+
+  setTimeout(function(){
+
+
+console.log(doot.state.recentRequests[0].object[0].name)
+
+  },1000)
+
 
 
 }
@@ -534,7 +573,9 @@ componentDidMount(){
             <button onClick={this.signout}>signout</button>
 
             <br/>
-              <ContractorPage isContractorLoggedIn={this.state.isContractorLoggedIn}/>
+              <ContractorPage
+              isContractorLoggedIn={this.state.isContractorLoggedIn}
+              recentRequests={this.state.recentRequests}/>
           </div>
         );
     }else{
