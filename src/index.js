@@ -19,3 +19,6 @@ var config = {
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();
+
+
+export {firebase};

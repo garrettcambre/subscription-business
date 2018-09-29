@@ -29,7 +29,7 @@ render(){
         <ModalBody>
           <h2> I would like to request </h2>
             <form>
-              <select onChange={this.props.handleRequestDropdown}>
+              <select onChange={this.props.handleRequestDropdown()}>
                 <option value={.5}> 1/2</option>
                 <option value={1}> 1</option>
                 <option value={2}> 2</option>

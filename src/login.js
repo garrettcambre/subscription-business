@@ -5,7 +5,7 @@ import ContractorPage from './contractorPage';
 import Home from './home';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Signup from './signup';
-import * as firebase from 'firebase';
+import {firebase}  from './index';
 
 var doot;
 var frbsUid;
@@ -175,6 +175,7 @@ class Login extends Component {
 
                    contractorRef = firebase.database().ref('users/' + frbsUid + '/isContractor')
                     contractorRef.on('value', function(snapshot) {
+                      console.log(snapshot.val())
                       doot.setState({
                         isContractorLoggedIn: snapshot.val()
                       })
@@ -436,60 +437,39 @@ class Login extends Component {
       })
     };
 
-    handleRequestDropdown(e){
-      doot.setState({
-        requestDropdownValue: e.target.value
-      })
+    handleRequestDropdown(){ //use a closure as a better syntax, a function that returns a function
+      return(e)=>{
+        this.setState({
+          requestDropdownValue: e.target.value
+        })
+        }
+
     };
 
 
   componentWillMount(){
       getPaddedDate()
-      function snapshotToArray(snapshot) {
-          var returnArr = [];
 
-          snapshot.forEach(function(childSnapshot) {
-              var item = []
-              var index = childSnapshot.val();
-              console.log(index);
-              index.key = childSnapshot.key;
-              console.log(index.key);
+//for requestscroll contracrtors
+  const recentRequestsRef = firebase.database().ref('requests/').limitToLast(3)
+     recentRequestsRef.on('value', function(snapshot) {
+       doot.setState({
+         recentRequests: Object.values(snapshot.val())
+       })
+       return snapshot.val()
+     })
 
-
-              childSnapshot.forEach(function(child){
-                console.log(child.val());
-                console.log(child.key)
-                item.push(child.key+" : "+child.val());
-              })
-
-              returnArr.push(item);
-          });
-
-          return returnArr;
-      };
-
-
-
-  var recentRequestsRef = firebase.database().ref('requests')
-  .limitToLast(4)
-    recentRequestsRef.on('value', snapshot => {
-      /* Update React state when message is added at Firebase Database */
-      let request = { object: snapshot.val(),
-                      id: snapshot.key
-                    };
-      doot.setState({ recentRequests: [request].concat(doot.state.recentRequests) });
-  })
 
 
 }
 //login componentDidMount
 componentDidMount(){
-  firebase.auth().signOut();
+  firebase.auth().signOut(); // this could be a serious issue, checkinto it
 
-  setTimeout(function(){
+  setTimeout(function(){//promises are better than timeouts
 
 
-console.log(doot.state.recentRequests[0].object[0].name)
+//console.log(Object.values(doot.state.recentRequests[0].object)[0].number)//can call [index].attributekey
 
   },1000)
 

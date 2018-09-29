@@ -1,39 +1,68 @@
 import React, { Component } from 'react';
+import {firebase}  from './index';
+import { Card, CardImg, CardText, CardBody,
+  CardTitle, CardSubtitle, Button } from 'reactstrap';
 
+let doot
 
-
-
-class UserPage extends Component{
+class RequestScroll extends Component{
   constructor(props){
     super(props);
     this.state={
-      recentRequests:'',
-
-
 
     }
+        doot=this
   }
 
 componentWillMount( ){
 
 
 
-  /*recentRequestsRef = firebase.database().ref('requests').limitToLast(10);
-  doot.setState({
-    recentRequests: JSON.stringify(recentRequestsRef)
-  })*/
+}
+render(){
+console.log(this.props.recentRequests)
+
+const loop=function(){
+  let i
+  for (i=0; i<doot.props.recentRequests.length; i++){
+
 }
 
+const test = function(index) {
+    <div>
+      <Card>
+        <CardBody>
+          <CardTitle>{doot.props.recentRequests[index].name} requested</CardTitle>
+          <CardText>{doot.props.recentRequests[index].requestHours} Hour(s)
+                     on {doot.props.recentRequests[index].requestDate}
+                     at {doot.props.recentRequests[index].address}
+          </CardText>
+          <Button>Button</Button>
+          <Button>Button</Button>
+          <Button>Button</Button>
+        </CardBody>
+      </Card>
+    </div>
+    console.log(index)
+    console.log(doot.props.recentRequests[index].name)
+    }
+  }
 
-render(){
+
+
+
+
+
+
+
+
   return(
     <div>
-
-
+      {test}
     </div>
 
   );
 }
 }
 
-export default UserPage;
+export default RequestScroll;
